@@ -1,1 +1,46 @@
 # kafka-kotlin-dsl
+
+# Fetching OpenAPI
+
+Mostly following [this instruction](https://github.com/kubernetes-client/java/blob/0e36e8a88ed733713822dddbb2e629c69e994a0e/docs/generate-model-from-third-party-resources.md).
+
+## Create local k8s cluster
+
+Following [Kubernetes-in-Docker](https://github.com/bsycorp/kind#quickstart)
+
+```bash
+docker run -it --privileged -p 8443:8443 -p 10080:10080 bsycorp/kind:latest-1.1
+
+# configure kubectl
+
+mv ~/.kube/config ~/.kube/config.gcp
+wget http://localhost:10080/config
+mv config ~/.kube/config
+
+# verify
+
+kubectl get nodes
+```
+
+## Install Confluent Operator
+
+Follow (official instructions)[https://docs.confluent.io/current/installation/operator/co-deployment.html#kubernetes-cluster]
+to the point where you run:
+
+```bash
+helm install \
+    -f ./providers/gcp.yaml \
+    --name operator \
+    --namespace operator \
+    --set operator.enabled=true \
+    ./confluent-operator
+```
+
+**Note:** no need to configure anything extra since we don't want working Kafka we just want the schema.
+
+## Fetch the Schema
+
+```bash
+kubectl get --raw="/openapi/v2" > /tmp/swagger
+docker run -i --rm yue9944882/java-model-gen -p com.github.fkorotkov.kafka < /tmp/swagger | tar -xzf - -C /tmp/
+```
