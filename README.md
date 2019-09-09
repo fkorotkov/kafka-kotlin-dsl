@@ -52,3 +52,9 @@ helm install \
 kubectl get --raw="/openapi/v2" > /tmp/swagger
 docker run -i --rm yue9944882/java-model-gen -p com.github.fkorotkov.kafka < /tmp/swagger | tar -xzf - -C /tmp/
 ```
+
+## Fetch JSON CRD Definition
+
+```bash
+kubectl get crd/kafkaclusters.cluster.confluent.com -o=json
+```
