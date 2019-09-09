@@ -9,7 +9,7 @@ Mostly following [this instruction](https://github.com/kubernetes-client/java/bl
 Following [Kubernetes-in-Docker](https://github.com/bsycorp/kind#quickstart)
 
 ```bash
-docker run -it --privileged -p 8443:8443 -p 10080:10080 bsycorp/kind:latest-1.1
+docker run -it --privileged -p 8443:8443 -p 10080:10080 bsycorp/kind:latest-1.15
 
 # configure kubectl
 
@@ -28,6 +28,14 @@ Follow (official instructions)[https://docs.confluent.io/current/installation/op
 to the point where you run:
 
 ```bash
+kubectl create serviceaccount tiller -n kube-system
+
+kubectl create clusterrolebinding tiller \
+    --clusterrole=cluster-admin \
+    --serviceaccount kube-system:tiller
+
+helm init --service-account tiller
+
 helm install \
     -f ./providers/gcp.yaml \
     --name operator \
